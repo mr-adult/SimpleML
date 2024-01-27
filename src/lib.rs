@@ -1,5 +1,5 @@
 use std::borrow::Cow;
-use tree_iterators_rs::prelude::{BorrowedTreeNode, OwnedTreeNode, TreeIteratorMut, TreeNode};
+use tree_iterators_rs::prelude::{OwnedTreeNode, TreeNode};
 use whitespacesv::{ColumnAlignment, WSVError, WSVWriter};
 
 /// Parses the Simple Markup Language text into a tree of SMLElements.
@@ -219,6 +219,10 @@ where
         return self;
     }
 
+    /// Writes the values in this SMLWriter out to a String. This operation
+    /// can fail if any of the values would result in an SML attribute or
+    /// element where the name is the same as the "End" keyword. If that
+    /// happens, you as the caller will receive an Err() variant of Result.
     pub fn to_string(self) -> Result<String, SMLWriterError> {
         let mut result = String::new();
         Self::to_string_helper(
@@ -388,6 +392,8 @@ where
 mod tests {
     use tree_iterators_rs::prelude::OwnedTreeNode;
 
+    use crate::{SMLAttribute, SMLElement, SMLWriter};
+
     #[test]
     fn reads_example_correctly() {
         let result = super::parse(include_str!("../example.txt")).unwrap();
@@ -535,5 +541,96 @@ mod tests {
                 .to_string()
                 .unwrap()
         );
+    }
+
+    #[test]
+    fn readme_example() {
+        use tree_iterators_rs::prelude::*;
+
+        // Build up our value set
+        let my_sml_values = TreeNode {
+            value: SMLElement {
+                name: "Configuration",
+                attributes: Vec::with_capacity(0),
+            },
+            children: Some(vec![
+                TreeNode {
+                    value: SMLElement {
+                        name: "Video",
+                        attributes: vec![
+                            SMLAttribute {
+                                name: "Resolution",
+                                values: vec![Some("1280"), Some("720")],
+                            },
+                            SMLAttribute {
+                                name: "RefreshRate",
+                                values: vec![Some("60")],
+                            },
+                            SMLAttribute {
+                                name: "Fullscreen",
+                                values: vec![Some("true")],
+                            },
+                        ],
+                    },
+                    children: None,
+                },
+                TreeNode {
+                    value: SMLElement {
+                        name: "Audio",
+                        attributes: vec![
+                            SMLAttribute {
+                                name: "Volume",
+                                values: vec![Some("100")],
+                            },
+                            SMLAttribute {
+                                name: "Music",
+                                values: vec![Some("80")],
+                            },
+                        ],
+                    },
+                    children: None,
+                },
+                TreeNode {
+                    value: SMLElement {
+                        name: "Player",
+                        attributes: vec![SMLAttribute {
+                            name: "Name",
+                            values: vec![Some("Hero 123")],
+                        }],
+                    },
+                    children: None,
+                },
+            ]),
+        };
+
+        // actually write the values
+        let str = SMLWriter::new(my_sml_values)
+            // Setting up a custom end keyword
+            .with_end_keyword("my_custom_end_keyword")
+            .unwrap()
+            // Using 8 spaces as the indent string. The default is 4 spaces.
+            .indent_with("        ")
+            .unwrap()
+            // Align the WSV tables to the right.
+            .align_columns(whitespacesv::ColumnAlignment::Right)
+            .to_string()
+            .unwrap();
+
+        /// Result:
+        /// Configuration
+        ///         Video
+        ///                  Resolution 1280 720
+        ///                 RefreshRate   60
+        ///                  Fullscreen true
+        ///         my_custom_end_keyword
+        ///         Audio
+        ///                 Volume 100
+        ///                  Music  80
+        ///         my_custom_end_keyword
+        ///         Player
+        ///                 Name "Hero 123"
+        ///         my_custom_end_keyword
+        /// my_custom_end_keyword
+        println!("{}", str);
     }
 }
