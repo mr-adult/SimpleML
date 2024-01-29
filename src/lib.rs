@@ -203,12 +203,26 @@ where
     /// Sets the end keyword to be used in the output.
     /// If the passed in str contains any whitespace characters,
     /// this call will fail and return None.
-    pub fn with_end_keyword(mut self, str: &str) -> Option<Self> {
-        if str.chars().any(|ch| Self::is_whitespace(ch)) {
-            return None;
+    pub fn with_end_keyword(mut self, str: &str) -> Self {
+        let needs_quotes = str
+            .chars()
+            .any(|ch| ch == '"' || ch == '#' || ch == '\n' || Self::is_whitespace(ch));
+        if !needs_quotes {
+            self.end_keyword = str.to_string();
+        } else {
+            let mut result = String::new();
+            result.push('"');
+            for ch in str.chars() {
+                match ch {
+                    '"' => result.push_str("\"\""),
+                    '\n' => result.push_str("\"/\""),
+                    ch => result.push(ch),
+                }
+            }
+            result.push('"');
+            self.end_keyword = result;
         }
-        self.end_keyword = str.to_string();
-        return Some(self);
+        return self;
     }
 
     /// Sets the column alignment of the attributes' generated WSV.
@@ -606,8 +620,7 @@ mod tests {
         // actually write the values
         let str = SMLWriter::new(my_sml_values)
             // Setting up a custom end keyword
-            .with_end_keyword("my_custom_end_keyword")
-            .unwrap()
+            .with_end_keyword("my_custom_end_keyword with spaces")
             // Using 8 spaces as the indent string. The default is 4 spaces.
             .indent_with("        ")
             .unwrap()
@@ -632,5 +645,47 @@ mod tests {
         ///         my_custom_end_keyword
         /// my_custom_end_keyword
         println!("{}", str);
+    }
+
+    #[test]
+    fn parses_input_with_strange_end_keyword() {
+        let input = r#"
+        Configuration
+                Video
+                        Resolution 1280 720
+                        RefreshRate   60
+                        Fullscreen true
+                "End with spaces"
+                Audio
+                        Volume 100
+                        Music  80
+                "End with spaces"
+                Player
+                        Name "Hero 123"
+                "End with spaces"
+        "End with spaces""#;
+
+        println!("{:?}", super::parse(input).unwrap());
+    }
+
+    #[test]
+    fn parses_input_with_null_end_keyword() {
+        let input = r#"
+        Configuration
+                Video
+                        Resolution 1280 720
+                        RefreshRate   60
+                        Fullscreen true
+                -
+                Audio
+                        Volume 100
+                        Music  80
+                -
+                Player
+                        Name "Hero 123"
+                -
+        -"#;
+
+        println!("{:?}", super::parse(input).unwrap());
     }
 }
