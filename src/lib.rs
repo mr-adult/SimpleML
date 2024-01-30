@@ -171,7 +171,7 @@ where
     StrAsRef: AsRef<str> + From<&'static str> + ToString,
 {
     indent_str: String,
-    end_keyword: String,
+    end_keyword: Option<String>,
     column_alignment: ColumnAlignment,
     values: TreeNode<SMLElement<StrAsRef>>,
 }
@@ -184,7 +184,7 @@ where
         Self {
             values,
             indent_str: "    ".to_string(), // default to 4 spaces
-            end_keyword: "End".to_string(), // Use "End" as the default
+            end_keyword: None, // Use minified as the default
             column_alignment: ColumnAlignment::default(),
         }
     }
@@ -201,28 +201,39 @@ where
     }
 
     /// Sets the end keyword to be used in the output.
-    /// If the passed in str contains any whitespace characters,
-    /// this call will fail and return None.
-    pub fn with_end_keyword(mut self, str: &str) -> Self {
-        let needs_quotes = str
-            .chars()
-            .any(|ch| ch == '"' || ch == '#' || ch == '\n' || Self::is_whitespace(ch));
-        if !needs_quotes {
-            self.end_keyword = str.to_string();
-        } else {
-            let mut result = String::new();
-            result.push('"');
-            for ch in str.chars() {
-                match ch {
-                    '"' => result.push_str("\"\""),
-                    '\n' => result.push_str("\"/\""),
-                    ch => result.push(ch),
-                }
+    /// If the passed in string is the empty string "",
+    /// '-' will be used instead.
+    pub fn with_end_keyword(mut self, str: Option<&str>) -> Self {
+        match str {
+            None | Some("") => {
+                self.end_keyword = None;
+                return self;
             }
-            result.push('"');
-            self.end_keyword = result;
+            Some(str) => {
+                debug_assert!(!str.is_empty());
+                let needs_quotes = str
+                    .chars()
+                    .any(|ch| ch == '"' || ch == '#' || ch == '\n' || Self::is_whitespace(ch))
+                    || str == "-";
+                
+                if !needs_quotes {
+                    self.end_keyword = Some(str.to_string());
+                } else {
+                    let mut result = String::new();
+                    result.push('"');
+                    for ch in str.chars() {
+                        match ch {
+                            '"' => result.push_str("\"\""),
+                            '\n' => result.push_str("\"/\""),
+                            ch => result.push(ch),
+                        }
+                    }
+                    result.push('"');
+                    self.end_keyword = Some(result);
+                }
+                return self;
+            }
         }
-        return self;
     }
 
     /// Sets the column alignment of the attributes' generated WSV.
@@ -244,7 +255,7 @@ where
             0,
             &self.column_alignment,
             &self.indent_str,
-            &self.end_keyword,
+            self.end_keyword.as_ref(),
             &mut result,
         )?;
         return Ok(result);
@@ -255,13 +266,16 @@ where
         depth: usize,
         alignment: &ColumnAlignment,
         indent_str: &str,
-        end_keyword: &str,
+        end_keyword: Option<&String>,
         buf: &mut String,
     ) -> Result<(), SMLWriterError> {
         let (value, children) = value.get_value_and_children();
-        if value.name.as_ref() == end_keyword {
-            return Err(SMLWriterError::ElementHasEndKeywordName);
+        if let Some(end_keyword) = end_keyword {
+            if value.name.as_ref() == end_keyword {
+                return Err(SMLWriterError::ElementHasEndKeywordName);
+            }
         }
+
         for _ in 0..depth {
             buf.push_str(indent_str);
         }
@@ -274,9 +288,11 @@ where
             }
         }
 
-        for attribute in value.attributes.iter() {
-            if attribute.name.as_ref() == end_keyword {
-                return Err(SMLWriterError::AttributeHasEndKeywordName);
+        if let Some(end_keyword) = end_keyword {
+            for attribute in value.attributes.iter() {
+                if attribute.name.as_ref() == end_keyword {
+                    return Err(SMLWriterError::AttributeHasEndKeywordName);
+                }
             }
         }
 
@@ -326,7 +342,10 @@ where
         for _ in 0..depth {
             buf.push_str(indent_str);
         }
-        buf.push_str(end_keyword);
+        match end_keyword {
+            None => buf.push('-'),
+            Some(end) => buf.push_str(end),
+        }
 
         return Ok(());
     }
@@ -620,7 +639,7 @@ mod tests {
         // actually write the values
         let str = SMLWriter::new(my_sml_values)
             // Setting up a custom end keyword
-            .with_end_keyword("my_custom_end_keyword with spaces")
+            .with_end_keyword(Some("my_custom_end_keyword"))
             // Using 8 spaces as the indent string. The default is 4 spaces.
             .indent_with("        ")
             .unwrap()
