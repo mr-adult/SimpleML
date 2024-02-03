@@ -369,6 +369,17 @@ pub enum SMLWriterError {
     AttributeHasEndKeywordName,
 }
 
+impl Error for SMLWriterError {}
+impl Display for SMLWriterError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            SMLWriterError::AttributeHasEndKeywordName => write!(f, "Attribute Has End Keyword Name")?,
+            SMLWriterError::ElementHasEndKeywordName => write!(f, "Element Has End Keyword Name")?,
+        }
+        Ok(())
+    }
+}
+
 #[derive(Debug, Clone)]
 pub enum ParseError {
     WSV(WSVError),
