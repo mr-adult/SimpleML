@@ -1,4 +1,4 @@
-use std::borrow::Cow;
+use std::{borrow::Cow, error::Error, fmt::Display};
 use tree_iterators_rs::prelude::{OwnedTreeNode, TreeNode};
 use whitespacesv::{ColumnAlignment, WSVError, WSVWriter};
 
@@ -375,6 +375,17 @@ pub enum ParseError {
     SML(SMLError),
 }
 
+impl Error for ParseError {}
+impl Display for ParseError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ParseError::SML(err) => err.fmt(f)?,
+            ParseError::WSV(err) => err.fmt(f)?,
+        }
+        Ok(())
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct SMLError {
     err_type: SMLErrorType,
@@ -387,6 +398,38 @@ impl SMLError {
     }
     pub fn line_num(&self) -> usize {
         self.line_num
+    }
+}
+
+impl Error for SMLError {}
+impl Display for SMLError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut result = String::new();
+        result.push_str("(line: ");
+        result.push_str(&self.line_num().to_string());
+        result.push_str(") ");
+        match self.err_type() {
+            SMLErrorType::EndKeywordNotDetected => {
+                result.push_str("End Keyword Not Detected");
+            }
+            SMLErrorType::InvalidRootElementStart => {
+                result.push_str("Invalid Root Element Start");
+            }
+            SMLErrorType::NullValueAsAttributeName => {
+                result.push_str("Null Value as Attribute Name");
+            }
+            SMLErrorType::NullValueAsElementName => {
+                result.push_str("Null Value as Element Name");
+            }
+            SMLErrorType::OnlyOneRootElementAllowed => {
+                result.push_str("Only One Root Element Allowed");
+            }
+            SMLErrorType::RootNotClosed => {
+                result.push_str("Root Not Closed");
+            }
+        }
+        write!(f, "{}", result)?;
+        Ok(())
     }
 }
 

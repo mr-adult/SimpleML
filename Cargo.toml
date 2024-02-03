@@ -11,5 +11,5 @@ keywords = ["sml", "simple", "markup", "language", "ReliableTXT"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-whitespacesv = "1.0.0"
+whitespacesv = "1.0.1"
 tree_iterators_rs = "1.1.4"

@@ -27,6 +27,6 @@ dependencies = [
 
 [[package]]
 name = "whitespacesv"
-version = "1.0.0"
+version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b2fc8001978a203e7264b90eb1fafa1b6ced0bde8f19f31d09ea3ed0873615f0"
+checksum = "7dfcd9b7b2a35ddbe9816b6a56669029518481ab1efd180a702eefed0b686e0b"
