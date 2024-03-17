@@ -3,6 +3,13 @@
 This crate is a rust implementation of the [Simple Markup Language](https://www.simpleml.com/) specification. This specification is built on top of the [Whitespace Separated Value](https://www.whitespacesv.com/) specification and provides a human-friendly configuration file format.
 
 
+## 0.3.0 patch notes
+
+Version 0.3.0 did not make many changes. The only changes that impact consumers are the following:
+- The dependency on tree_iterators_rs was changed from version 1.1.4 to 1.2.1
+- The [parse_owned](https://docs.rs/simpleml/0.2.2/simpleml/fn.parse_owned.html) function was added
+
+
 ## Parsing
 
 This crate only provides a single API for parsing SML files. The [parse](https://docs.rs/simpleml/latest/simpleml/fn.parse.html) function will parse the SML input, returning a Result. The Ok variant is a [TreeNode](https://docs.rs/tree_iterators_rs/latest/tree_iterators_rs/prelude/struct.TreeNode.html) from the [tree_iterators_rs](https://crates.io/crates/tree_iterators_rs) crate representing the elements of the hierarchy. I have chosen to build on top of it to provide you with all of the tree traversal utility methods built there when working with your SML content. I recommend adding `use tree_iterators_rs::prelude::*;` to the files that handle the SML content to pull the traversal methods into scope.
@@ -50,6 +57,7 @@ U+3000 	    Ideographic Space
 An example of how to use the SMLWriter is as follows:
 ```rust
 use tree_iterators_rs::prelude::*;
+use simpleml::{SMLWriter, SMLElement, SMLAttribute};
 
 // Build up our value set
 let my_sml_values = TreeNode {
@@ -119,6 +127,7 @@ let str = SMLWriter::new(my_sml_values)
     .to_string()
     .unwrap();
 
+/// Result:
 /// Configuration
 ///         Video
 ///                  Resolution 1280 720

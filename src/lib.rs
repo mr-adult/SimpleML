@@ -1,9 +1,11 @@
+#![doc = include_str!("../README.md")]
+
 use std::{borrow::Cow, error::Error, fmt::Display};
 use tree_iterators_rs::prelude::{OwnedTreeNode, TreeNode};
 use whitespacesv::{ColumnAlignment, WSVError, WSVWriter};
 
 /// Equivalent to [parse](https://docs.rs/simpleml/latest/simpleml/fn.parse.html),
-/// but returns Strings instead of Cows for ease of use.
+/// but returns Strings instead of Cows for better ease of use.
 pub fn parse_owned(source_text: &str) -> Result<TreeNode<SMLElement<String>>, ParseError> {
     let borrowed = parse(source_text)?;
     Ok(to_owned(borrowed))
