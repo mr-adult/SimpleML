@@ -2,6 +2,31 @@ use std::{borrow::Cow, error::Error, fmt::Display};
 use tree_iterators_rs::prelude::{OwnedTreeNode, TreeNode};
 use whitespacesv::{ColumnAlignment, WSVError, WSVWriter};
 
+/// Equivalent to [parse](https://docs.rs/simpleml/latest/simpleml/fn.parse.html),
+/// but returns Strings instead of Cows for ease of use.
+pub fn parse_owned(source_text: &str) -> Result<TreeNode<SMLElement<String>>, ParseError> {
+    let borrowed = parse(source_text)?;
+    Ok(to_owned(borrowed))
+}
+
+fn to_owned(tree: TreeNode<SMLElement<Cow<'_, str>>>) -> TreeNode<SMLElement<String>> {
+    let children = match tree.children {
+        None => None,
+        Some(children) => {
+            let mut new_children = Vec::with_capacity(children.len());
+            for child in children {
+                new_children.push(to_owned(child));
+            }
+            Some(new_children)
+        }
+    };
+
+    TreeNode {
+        value: tree.value.to_owned(),
+        children,
+    }
+}
+
 /// Parses the Simple Markup Language text into a tree of SMLElements.
 /// For details about how to use TreeNode, see [tree_iterators_rs](https://crates.io/crates/tree_iterators_rs)
 /// and the documentation related to that crate.
@@ -184,7 +209,7 @@ where
         Self {
             values,
             indent_str: "    ".to_string(), // default to 4 spaces
-            end_keyword: None, // Use minified as the default
+            end_keyword: None,              // Use minified as the default
             column_alignment: ColumnAlignment::default(),
         }
     }
@@ -215,7 +240,7 @@ where
                     .chars()
                     .any(|ch| ch == '"' || ch == '#' || ch == '\n' || Self::is_whitespace(ch))
                     || str == "-";
-                
+
                 if !needs_quotes {
                     self.end_keyword = Some(str.to_string());
                 } else {
@@ -373,7 +398,9 @@ impl Error for SMLWriterError {}
 impl Display for SMLWriterError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            SMLWriterError::AttributeHasEndKeywordName => write!(f, "Attribute Has End Keyword Name")?,
+            SMLWriterError::AttributeHasEndKeywordName => {
+                write!(f, "Attribute Has End Keyword Name")?
+            }
             SMLWriterError::ElementHasEndKeywordName => write!(f, "Element Has End Keyword Name")?,
         }
         Ok(())
@@ -466,6 +493,23 @@ where
     pub attributes: Vec<SMLAttribute<StrAsRef>>,
 }
 
+impl SMLElement<Cow<'_, str>> {
+    fn to_owned(self) -> SMLElement<String> {
+        let mut attributes = Vec::with_capacity(self.attributes.len());
+        for attr in self.attributes {
+            attributes.push(attr.to_owned());
+        }
+
+        SMLElement {
+            name: match self.name {
+                Cow::Borrowed(str) => str.to_string(),
+                Cow::Owned(string) => string,
+            },
+            attributes,
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct SMLAttribute<StrAsRef>
 where
@@ -473,6 +517,30 @@ where
 {
     pub name: StrAsRef,
     pub values: Vec<Option<StrAsRef>>,
+}
+
+impl SMLAttribute<Cow<'_, str>> {
+    fn to_owned(self) -> SMLAttribute<String> {
+        let mut values = Vec::with_capacity(self.values.len());
+        for value in self.values {
+            let new_value = match value {
+                None => None,
+                Some(cow) => match cow {
+                    Cow::Borrowed(str) => Some(str.to_string()),
+                    Cow::Owned(string) => Some(string),
+                },
+            };
+
+            values.push(new_value);
+        }
+        SMLAttribute {
+            name: match self.name {
+                Cow::Borrowed(str) => str.to_string(),
+                Cow::Owned(string) => string,
+            },
+            values,
+        }
+    }
 }
 
 #[cfg(test)]
@@ -617,6 +685,93 @@ mod tests {
     }
 
     #[test]
+    fn reads_example_correctly_owned() {
+        let result = super::parse_owned(include_str!("../example.txt")).unwrap();
+        for (i, element) in result.dfs_preorder().enumerate() {
+            match i {
+                0 => {
+                    assert_eq!("Configuration", &element.name);
+                    assert_eq!(0, element.attributes.len());
+                }
+                1 => {
+                    assert_eq!("Video", &element.name);
+                    assert_eq!(3, element.attributes.len());
+                    for (j, attribute) in element.attributes.into_iter().enumerate() {
+                        match j {
+                            0 => {
+                                assert_eq!("Resolution", attribute.name);
+                                assert_eq!(2, attribute.values.len());
+                                assert_eq!(
+                                    "1280",
+                                    attribute.values.get(0).as_ref().unwrap().as_ref().unwrap()
+                                );
+                                assert_eq!(
+                                    "720",
+                                    attribute.values.get(1).as_ref().unwrap().as_ref().unwrap()
+                                );
+                            }
+                            1 => {
+                                assert_eq!("RefreshRate", attribute.name);
+                                assert_eq!(1, attribute.values.len());
+                                assert_eq!(
+                                    "60",
+                                    attribute.values.get(0).as_ref().unwrap().as_ref().unwrap()
+                                );
+                            }
+                            2 => {
+                                assert_eq!("Fullscreen", attribute.name);
+                                assert_eq!(1, attribute.values.len());
+                                assert_eq!(
+                                    "true",
+                                    attribute.values.get(0).as_ref().unwrap().as_ref().unwrap()
+                                );
+                            }
+                            _ => panic!("Should only have 3 attributes"),
+                        }
+                    }
+                }
+                2 => {
+                    assert_eq!("Audio", &element.name);
+                    assert_eq!(2, element.attributes.len());
+                    for (j, attribute) in element.attributes.into_iter().enumerate() {
+                        match j {
+                            0 => {
+                                assert_eq!("Volume", attribute.name);
+                                assert_eq!(1, attribute.values.len());
+                                assert_eq!(
+                                    "100",
+                                    attribute.values.get(0).as_ref().unwrap().as_ref().unwrap()
+                                );
+                            }
+                            1 => {
+                                assert_eq!("Music", attribute.name);
+                                assert_eq!(1, attribute.values.len());
+                                assert_eq!(
+                                    "80",
+                                    attribute.values.get(0).as_ref().unwrap().as_ref().unwrap()
+                                );
+                            }
+                            _ => panic!("Should only have 2 values under audio"),
+                        }
+                    }
+                }
+                3 => {
+                    assert_eq!("Player", element.name);
+                    assert_eq!(1, element.attributes.len());
+                    let attr = element.attributes.get(0).unwrap();
+                    assert_eq!("Name", attr.name);
+                    assert_eq!(1, attr.values.len());
+                    assert_eq!(
+                        "Hero 123",
+                        attr.values.get(0).as_ref().unwrap().as_ref().unwrap()
+                    );
+                }
+                _ => panic!("Should only have 4 sub-elements"),
+            }
+        }
+    }
+
+    #[test]
     fn test_write() {
         let input = include_str!("../example.txt");
         println!(
@@ -739,6 +894,27 @@ mod tests {
         "End with spaces""#;
 
         println!("{:?}", super::parse(input).unwrap());
+    }
+
+    #[test]
+    fn parses_input_with_strange_end_keyword_owned() {
+        let input = r#"
+        Configuration
+                Video
+                        Resolution 1280 720
+                        RefreshRate   60
+                        Fullscreen true
+                "End with spaces"
+                Audio
+                        Volume 100
+                        Music  80
+                "End with spaces"
+                Player
+                        Name "Hero 123"
+                "End with spaces"
+        "End with spaces""#;
+
+        println!("{:?}", super::parse_owned(input).unwrap());
     }
 
     #[test]
