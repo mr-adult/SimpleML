@@ -1,10 +1,21 @@
 # SimpleML
 
-This crate is a rust implementation of the [Simple Markup Language](https://www.simpleml.com/) specification. This specification is built on top of the [Whitespace Separated Value](https://www.whitespacesv.com/) specification and provides a human-friendly configuration file format.
+This crate is a rust implementation of the [Simple Markup Language](https://www.simpleml.com/) specification. This specification is built on top of the [Whitespace Separated Value](https://dev.stenway.com/WSV/Specification.html) specification and provides a human-friendly configuration file format.
 
 
-## 0.3.0 patch notes
+## Patch Notes
 
+### 1.0.0
+This crate is 1.0 now! No breaking changes were introduced in this version, but it fixes a bug where malformed SML like the following would cause a panic:
+
+```simpleml
+Root
+    InnerElement
+    # No closing tag
+End
+```
+
+### 0.3.0
 Version 0.3.0 did not make many changes. The only changes that impact consumers are the following:
 - The dependency on tree_iterators_rs was changed from version 1.1.4 to 1.2.1
 - The [parse_owned](https://docs.rs/simpleml/latest/simpleml/fn.parse_owned.html) function was added
@@ -12,9 +23,13 @@ Version 0.3.0 did not make many changes. The only changes that impact consumers 
 
 ## Parsing
 
-This crate only provides a single API for parsing SML files. The [parse](https://docs.rs/simpleml/latest/simpleml/fn.parse.html) function will parse the SML input, returning a Result. The Ok variant is a [TreeNode](https://docs.rs/tree_iterators_rs/latest/tree_iterators_rs/prelude/struct.TreeNode.html) from the [tree_iterators_rs](https://crates.io/crates/tree_iterators_rs) crate representing the elements of the hierarchy. I have chosen to build on top of it to provide you with all of the tree traversal utility methods built there when working with your SML content. I recommend adding `use tree_iterators_rs::prelude::*;` to the files that handle the SML content to pull the traversal methods into scope.
+This crate only provides a two APIs for parsing SML files. The [parse](https://docs.rs/simpleml/latest/simpleml/fn.parse.html) and [parse_owned](https://docs.rs/simpleml/latest/simpleml/fn.parse_owned.html) functions will parse the SML input, returning a Result. The Ok variant is a [TreeNode](https://docs.rs/tree_iterators_rs/latest/tree_iterators_rs/prelude/struct.TreeNode.html) from the [tree_iterators_rs](https://crates.io/crates/tree_iterators_rs) crate representing the elements of the hierarchy. I have chosen to build on top of it to provide you with all of the tree traversal utility methods built there when working with your SML content. I recommend adding `use tree_iterators_rs::prelude::*;` to the files that handle the SML content to pull the traversal methods into scope. The only difference between the two APIs is that [parse](https://docs.rs/simpleml/latest/simpleml/fn.parse.html) uses Cow<'_, str>'s to represent the SML nodes, and [parse_owned](https://docs.rs/simpleml/latest/simpleml/fn.parse_owned.html) uses Strings to represent the SML nodes. If you don't want to deal with lifetimes, use [parse_owned](https://docs.rs/simpleml/latest/simpleml/fn.parse_owned.html).
 
 Because SML is an extension on top of WSV, I have also pulled in [whitespacesv](https://crates.io/crates/whitespacesv) as a dependency.
+
+## In-line Declaration
+
+If you plan to include any SimpleML in your rust code or build system, consider using [simpleml_macro](https://crates.io/crates/simpleml_macro) to maintain everything in valid SML format.
 
 
 ## Writing
