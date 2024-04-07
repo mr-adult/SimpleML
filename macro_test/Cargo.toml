@@ -1,0 +1,11 @@
+[package]
+name = "macro_test"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+simpleml = "0.3.0"
+simpleml_macro = { path = "../macro" }
+tree_iterators_rs = "1.2.1"
