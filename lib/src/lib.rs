@@ -190,7 +190,15 @@ pub fn parse(source_text: &str) -> Result<TreeNode<SMLElement<Cow<'_, str>>>, Pa
         }
     }
 
-    return Ok(result.unwrap());
+    match result {
+        None => Err(ParseError::SML(SMLError {
+                err_type: SMLErrorType::RootNotClosed,
+                line_num: 0,
+            })),
+        Some(result) => {
+            Ok(result)
+        }
+    }
 }
 
 pub struct SMLWriter<StrAsRef>
@@ -938,5 +946,16 @@ mod tests {
         -"#;
 
         println!("{:?}", super::parse(input).unwrap());
+    }
+
+    #[test]
+    fn doesnt_crash_bad_input() {
+        let str = r#"Value1
+            Configuration 2 0 2
+            Otherval 1
+            InnerEl
+        -"#;
+
+        super::parse(str).ok();
     }
 }
