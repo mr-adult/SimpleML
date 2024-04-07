@@ -1,4 +1,5 @@
 #![feature(proc_macro_span)]
+#![doc = include_str!("../README.md")]
 
 use std::borrow::Cow;
 
@@ -13,6 +14,9 @@ extern crate proc_macro;
 
 static DEBUG: bool = false;
 
+/// Handles parsing and converting the SML into a Rust-based 
+/// TreeNode representation for better portability between
+/// SML files.
 #[proc_macro]
 pub fn sml(stream: TokenStream) -> TokenStream {
     let converted_string = reconstruct_source_whitespace(stream.into_iter());

@@ -6,17 +6,9 @@ version = 3
 name = "macro_test"
 version = "0.1.0"
 dependencies = [
- "simpleml 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "simpleml 0.3.0",
  "simpleml_macro",
  "tree_iterators_rs",
-]
-
-[[package]]
-name = "simpleml"
-version = "0.3.0"
-dependencies = [
- "tree_iterators_rs",
- "whitespacesv",
 ]
 
 [[package]]
@@ -30,10 +22,18 @@ dependencies = [
 ]
 
 [[package]]
-name = "simpleml_macro"
-version = "0.1.0"
+name = "simpleml"
+version = "1.0.0"
 dependencies = [
- "simpleml 0.3.0",
+ "tree_iterators_rs",
+ "whitespacesv",
+]
+
+[[package]]
+name = "simpleml_macro"
+version = "1.0.0"
+dependencies = [
+ "simpleml 1.0.0",
  "tree_iterators_rs",
 ]
 
