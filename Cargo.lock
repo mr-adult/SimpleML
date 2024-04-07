@@ -30,10 +30,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "simpleml"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0b252fc3662b0932eabdb811f5d07bad4360f9a72b14aea591af2447e535fac8"
+dependencies = [
+ "tree_iterators_rs",
+ "whitespacesv",
+]
+
+[[package]]
 name = "simpleml_macro"
 version = "1.0.0"
 dependencies = [
- "simpleml 1.0.0",
+ "simpleml 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "tree_iterators_rs",
 ]
 

@@ -5,7 +5,7 @@ edition = "2021"
 description = "A macro for placing SimpleML content directly into Rust source code."
 license = "MIT"
 repository = "https://github.com/mr-adult/SimpleML"
-documentation = "https://docs.rs/simpleml/latest/simpleml/"
+documentation = "https://docs.rs/simpleml_macro/latest/simpleml_macro/"
 keywords = ["sml", "simple", "markup", "language", "ReliableTXT"]
 
 [lib]
