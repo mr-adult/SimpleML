@@ -3,11 +3,38 @@
 version = 3
 
 [[package]]
+name = "macro_test"
+version = "0.1.0"
+dependencies = [
+ "simpleml 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "simpleml_macro",
+ "tree_iterators_rs",
+]
+
+[[package]]
 name = "simpleml"
 version = "0.3.0"
 dependencies = [
  "tree_iterators_rs",
  "whitespacesv",
+]
+
+[[package]]
+name = "simpleml"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cd99e7c2b3dba835dcbf2c58e64ea8cee9fd7f48ed3f57233414c31504ce28e8"
+dependencies = [
+ "tree_iterators_rs",
+ "whitespacesv",
+]
+
+[[package]]
+name = "simpleml_macro"
+version = "0.1.0"
+dependencies = [
+ "simpleml 0.3.0",
+ "tree_iterators_rs",
 ]
 
 [[package]]

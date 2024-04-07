@@ -7,7 +7,7 @@ This crate is a rust implementation of the [Simple Markup Language](https://www.
 
 Version 0.3.0 did not make many changes. The only changes that impact consumers are the following:
 - The dependency on tree_iterators_rs was changed from version 1.1.4 to 1.2.1
-- The [parse_owned](https://docs.rs/simpleml/0.2.2/simpleml/fn.parse_owned.html) function was added
+- The [parse_owned](https://docs.rs/simpleml/latest/simpleml/fn.parse_owned.html) function was added
 
 
 ## Parsing
