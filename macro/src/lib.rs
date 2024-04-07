@@ -11,7 +11,7 @@ use tree_iterators_rs::prelude::TreeNode;
 
 extern crate proc_macro;
 
-static DEBUG: bool = true;
+static DEBUG: bool = false;
 
 #[proc_macro]
 pub fn sml(stream: TokenStream) -> TokenStream {
@@ -20,6 +20,7 @@ pub fn sml(stream: TokenStream) -> TokenStream {
     if DEBUG {
         #[cfg(debug_assertions)]
         println!("{}", converted_string);
+        println!("");
     }
     match parse(&converted_string) {
         Ok(tree) => {
