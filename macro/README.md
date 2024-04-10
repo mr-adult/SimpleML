@@ -1,8 +1,15 @@
 # SimpleML Macro
 
-This crate is an extension of [simpleml](https://crates.io/crates/simpleml). It creates an "sml" macro to allow you to declare SML-based config within your code. In order to use this macro, add the following to your Cargo.toml.
+This crate is an extension of [simpleml](https://crates.io/crates/simpleml). It creates an "sml" macro to allow you to declare SML-based config within your code. 
 
-NOTE: This macro requires the nightly compiler for the [proc_macro_span](https://github.com/rust-lang/rust/issues/54725) feature.
+## Patch Notes
+
+### 1.0.1
+[Fixes a macro panic when null values are used](https://github.com/mr-adult/SimpleML/issues/1)
+
+## Usage
+
+In order to use this macro, add the following to your Cargo.toml. NOTE: This macro requires the nightly compiler for the [proc_macro_span](https://github.com/rust-lang/rust/issues/54725) feature.
 
 ```toml
 [dependencies]
