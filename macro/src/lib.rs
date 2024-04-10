@@ -24,6 +24,7 @@ pub fn sml(stream: TokenStream) -> TokenStream {
     if DEBUG {
         #[cfg(debug_assertions)]
         println!("{}", converted_string);
+        #[cfg(debug_assertions)]
         println!("");
     }
     match parse(&converted_string) {
@@ -183,9 +184,7 @@ fn convert_sml_to_rust(tree: TreeNode<SMLElement<Cow<'_, str>>>) -> TokenStream 
                                                         let mut tokens = Vec::with_capacity(3);
                                                         match value {
                                                             None => {
-                                                                tokens.push(TokenTree::Literal(
-                                                                    Literal::string("-"),
-                                                                ))
+                                                                tokens.push(TokenTree::Ident(Ident::new("None", Span::call_site())))
                                                             }
                                                             Some(str) => {
                                                                 tokens.push(TokenTree::Ident(
