@@ -3,30 +3,75 @@
 version = 3
 
 [[package]]
+name = "itoa"
+version = "1.0.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "49f1f14873335454500d59611f1cf4a4b0f786f9ac11f4312a78e4cf2566695b"
+
+[[package]]
 name = "macro_test"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
- "simpleml 0.3.0",
+ "serde_json",
+ "simpleml 1.0.0",
  "simpleml_macro",
  "tree_iterators_rs",
+ "whitespacesv",
 ]
 
 [[package]]
-name = "simpleml"
-version = "0.3.0"
+name = "proc-macro2"
+version = "1.0.79"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cd99e7c2b3dba835dcbf2c58e64ea8cee9fd7f48ed3f57233414c31504ce28e8"
+checksum = "e835ff2298f5721608eb1a980ecaee1aef2c132bf95ecc026a11b7bf3c01c02e"
 dependencies = [
- "tree_iterators_rs",
- "whitespacesv",
+ "unicode-ident",
 ]
 
 [[package]]
-name = "simpleml"
-version = "1.0.0"
+name = "quote"
+version = "1.0.35"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "291ec9ab5efd934aaf503a6466c5d5251535d108ee747472c3977cc5acc868ef"
 dependencies = [
- "tree_iterators_rs",
- "whitespacesv",
+ "proc-macro2",
+]
+
+[[package]]
+name = "ryu"
+version = "1.0.17"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e86697c916019a8588c99b5fac3cead74ec0b4b819707a682fd4d23fa0ce1ba1"
+
+[[package]]
+name = "serde"
+version = "1.0.197"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3fb1c873e1b9b056a4dc4c0c198b24c3ffa059243875552b2bd0933b1aee4ce2"
+dependencies = [
+ "serde_derive",
+]
+
+[[package]]
+name = "serde_derive"
+version = "1.0.197"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7eb0b34b42edc17f6b7cac84a52a1c5f0e1bb2227e997ca9011ea3dd34e8610b"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "serde_json"
+version = "1.0.115"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "12dc5c46daa8e9fdf4f5e71b6cf9a53f2487da0e86e55808e2d35539666497dd"
+dependencies = [
+ "itoa",
+ "ryu",
+ "serde",
 ]
 
 [[package]]
@@ -40,10 +85,18 @@ dependencies = [
 ]
 
 [[package]]
-name = "simpleml_macro"
-version = "1.0.0"
+name = "simpleml"
+version = "1.0.1"
 dependencies = [
- "simpleml 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "tree_iterators_rs",
+ "whitespacesv",
+]
+
+[[package]]
+name = "simpleml_macro"
+version = "1.0.1"
+dependencies = [
+ "simpleml 1.0.0",
  "tree_iterators_rs",
 ]
 
@@ -54,16 +107,35 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2b2231b7c3057d5e4ad0156fb3dc807d900806020c5ffa3ee6ff2c8c76fb8520"
 
 [[package]]
+name = "syn"
+version = "2.0.55"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "002a1b3dbf967edfafc32655d0f377ab0bb7b994aa1d32c8cc7e9b8bf3ebb8f0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "unicode-ident",
+]
+
+[[package]]
 name = "tree_iterators_rs"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "35bd22d378c78c58e20672ecd4ec4507a43325742daa79c5db037de084eb5f0c"
 dependencies = [
+ "serde",
+ "serde_derive",
  "streaming-iterator",
 ]
 
 [[package]]
-name = "whitespacesv"
-version = "1.0.1"
+name = "unicode-ident"
+version = "1.0.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7dfcd9b7b2a35ddbe9816b6a56669029518481ab1efd180a702eefed0b686e0b"
+checksum = "3354b9ac3fae1ff6755cb6db53683adb661634f67557942dea4facebec0fee4b"
+
+[[package]]
+name = "whitespacesv"
+version = "1.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f247f84ab85ed191183badb78209b6ea3fb7ef35af2347a08f243200401be11f"
