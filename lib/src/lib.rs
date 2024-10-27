@@ -12,20 +12,14 @@ pub fn parse_owned(source_text: &str) -> Result<TreeNode<SMLElement<String>>, Pa
 }
 
 fn to_owned(tree: TreeNode<SMLElement<Cow<'_, str>>>) -> TreeNode<SMLElement<String>> {
-    let children = match tree.children {
-        None => None,
-        Some(children) => {
-            let mut new_children = Vec::with_capacity(children.len());
-            for child in children {
-                new_children.push(to_owned(child));
-            }
-            Some(new_children)
-        }
-    };
+    let mut new_children = Vec::with_capacity(tree.children.len());
+    for child in tree.children {
+        new_children.push(to_owned(child));
+    }
 
     TreeNode {
         value: tree.value.to_owned(),
-        children,
+        children: new_children,
     }
 }
 
@@ -83,7 +77,7 @@ pub fn parse(source_text: &str) -> Result<TreeNode<SMLElement<Cow<'_, str>>>, Pa
             name: root_element_name,
             attributes: Vec::with_capacity(0),
         },
-        children: None,
+        children: Vec::new(),
     };
     let mut nodes_being_built = vec![root];
     let mut result = None;
@@ -144,10 +138,7 @@ pub fn parse(source_text: &str) -> Result<TreeNode<SMLElement<Cow<'_, str>>>, Pa
                             .get_mut(nodes_being_built_len - 1)
                             .unwrap();
 
-                        match &mut new_top.children {
-                            None => new_top.children = Some(vec![top]),
-                            Some(children) => children.push(top),
-                        }
+                        new_top.children.push(top);
                     }
                 }
             } else {
@@ -156,7 +147,7 @@ pub fn parse(source_text: &str) -> Result<TreeNode<SMLElement<Cow<'_, str>>>, Pa
                         name: val.expect("BUG: Null element names are prohibited."),
                         attributes: Vec::with_capacity(0),
                     },
-                    children: None,
+                    children: Vec::new(),
                 });
             }
         } else {
@@ -192,12 +183,10 @@ pub fn parse(source_text: &str) -> Result<TreeNode<SMLElement<Cow<'_, str>>>, Pa
 
     match result {
         None => Err(ParseError::SML(SMLError {
-                err_type: SMLErrorType::RootNotClosed,
-                line_num: 0,
-            })),
-        Some(result) => {
-            Ok(result)
-        }
+            err_type: SMLErrorType::RootNotClosed,
+            line_num: 0,
+        })),
+        Some(result) => Ok(result),
     }
 }
 
@@ -369,7 +358,7 @@ where
             }
         }
 
-        for child in children.into_iter().flat_map(|opt| opt) {
+        for child in children.into_iter() {
             buf.push('\n');
             Self::to_string_helper(child, depth + 1, alignment, indent_str, end_keyword, buf)?;
         }
@@ -805,7 +794,7 @@ mod tests {
                 name: "Configuration",
                 attributes: Vec::with_capacity(0),
             },
-            children: Some(vec![
+            children: vec![
                 TreeNode {
                     value: SMLElement {
                         name: "Video",
@@ -824,7 +813,7 @@ mod tests {
                             },
                         ],
                     },
-                    children: None,
+                    children: Vec::new(),
                 },
                 TreeNode {
                     value: SMLElement {
@@ -840,7 +829,7 @@ mod tests {
                             },
                         ],
                     },
-                    children: None,
+                    children: Vec::new(),
                 },
                 TreeNode {
                     value: SMLElement {
@@ -850,9 +839,9 @@ mod tests {
                             values: vec![Some("Hero 123")],
                         }],
                     },
-                    children: None,
+                    children: Vec::new(),
                 },
-            ]),
+            ],
         };
 
         // actually write the values

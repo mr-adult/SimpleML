@@ -1,15 +1,20 @@
 # SimpleML Macro
 
-This crate is an extension of [simpleml](https://crates.io/crates/simpleml). It creates an "sml" macro to allow you to declare SML-based config within your code. 
+This crate is an extension of [simpleml](https://crates.io/crates/simpleml). It
+creates an "sml" macro to allow you to declare SML-based config within your
+code.
 
 ## Patch Notes
 
 ### 1.0.1
+
 [Fixes a macro panic when null values are used](https://github.com/mr-adult/SimpleML/issues/1)
 
 ## Usage
 
-In order to use this macro, add the following to your Cargo.toml. NOTE: This macro requires the nightly compiler for the [proc_macro_span](https://github.com/rust-lang/rust/issues/54725) feature.
+In order to use this macro, add the following to your Cargo.toml. NOTE: This
+macro requires the nightly compiler for the
+[proc_macro_span](https://github.com/rust-lang/rust/issues/54725) feature.
 
 ```toml
 [dependencies]
@@ -18,9 +23,13 @@ simpleml = "1.0.0"
 simpleml_macro = "1.0.0"
 ```
 
-Once you have these dependencies in place, simply add a using for the macro, and use it in your code. As an example, let's convert the following in-line declaration of the SML data structure over to using the macro. This example comes from the README.md file of [simpleml](https://crates.io/crates/simpleml).
+Once you have these dependencies in place, simply add a using for the macro, and
+use it in your code. As an example, let's convert the following in-line
+declaration of the SML data structure over to using the macro. This example
+comes from the README.md file of [simpleml](https://crates.io/crates/simpleml).
 
 ### Before
+
 ```rust
 use tree_iterators_rs::prelude::*;
 use simpleml::{SMLWriter, SMLElement, SMLAttribute};
@@ -30,7 +39,7 @@ let my_sml_values = TreeNode {
         name: "Configuration",
         attributes: Vec::with_capacity(0),
     },
-    children: Some(vec![
+    children: vec![
         TreeNode {
             value: SMLElement {
                 name: "Video",
@@ -49,7 +58,7 @@ let my_sml_values = TreeNode {
                     },
                 ],
             },
-            children: None,
+            children: Vec::new(),
         },
         TreeNode {
             value: SMLElement {
@@ -65,7 +74,7 @@ let my_sml_values = TreeNode {
                     },
                 ],
             },
-            children: None,
+            children: Vec::new(),
         },
         TreeNode {
             value: SMLElement {
@@ -75,13 +84,14 @@ let my_sml_values = TreeNode {
                     values: vec![Some("Hero 123")],
                 }],
             },
-            children: None,
+            children: Vec::new(),
         },
-    ]),
+    ],
 };
 ```
 
 ### After
+
 ```rust
 use simpleml_macro::sml;
 

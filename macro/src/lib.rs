@@ -14,7 +14,7 @@ extern crate proc_macro;
 
 static DEBUG: bool = false;
 
-/// Handles parsing and converting the SML into a Rust-based 
+/// Handles parsing and converting the SML into a Rust-based
 /// TreeNode representation for better portability between
 /// SML files.
 #[proc_macro]
@@ -24,8 +24,6 @@ pub fn sml(stream: TokenStream) -> TokenStream {
     if DEBUG {
         #[cfg(debug_assertions)]
         println!("{}", converted_string);
-        #[cfg(debug_assertions)]
-        println!("");
     }
     match parse(&converted_string) {
         Ok(tree) => {
@@ -66,14 +64,27 @@ fn reconstruct_source_whitespace_internal(
         end_position = Some((token_end.line(), token_end.column()));
 
         match previous_token_end {
-            None => {}
+            None => {
+                for _ in 0..token_start.column() - 1 {
+                    builder.push(' ');
+                }
+            }
             Some(end) => {
                 // insert a new line to match the token stream
                 if end.0 != token_start.line() {
-                    builder.push('\n');
+                    for _ in 0..token_start.line() - end.0 {
+                        builder.push('\n');
+                    }
+
+                    for _ in 0..token_start.column() - 1 {
+                        builder.push(' ');
+                    }
+
                     // insert a space to match the token stream
                 } else if end.1 != token_start.column() {
-                    builder.push(' ');
+                    for _ in 0..token_start.column() - end.1 {
+                        builder.push(' ');
+                    }
                 }
             }
         }
@@ -183,9 +194,12 @@ fn convert_sml_to_rust(tree: TreeNode<SMLElement<Cow<'_, str>>>) -> TokenStream 
                                                     attr.values.into_iter().flat_map(|value| {
                                                         let mut tokens = Vec::with_capacity(3);
                                                         match value {
-                                                            None => {
-                                                                tokens.push(TokenTree::Ident(Ident::new("None", Span::call_site())))
-                                                            }
+                                                            None => tokens.push(TokenTree::Ident(
+                                                                Ident::new(
+                                                                    "None",
+                                                                    Span::call_site(),
+                                                                ),
+                                                            )),
                                                             Some(str) => {
                                                                 tokens.push(TokenTree::Ident(
                                                                     Ident::new(
@@ -229,26 +243,15 @@ fn convert_sml_to_rust(tree: TreeNode<SMLElement<Cow<'_, str>>>) -> TokenStream 
                 TokenTree::Punct(Punct::new(',', Spacing::Alone)),
                 TokenTree::Ident(Ident::new("children", Span::call_site())),
                 TokenTree::Punct(Punct::new(':', Spacing::Alone)),
-                TokenTree::Ident(Ident::new("Some", Span::call_site())),
+                TokenTree::Ident(Ident::new("vec", Span::call_site())),
+                TokenTree::Punct(Punct::new('!', Spacing::Alone)),
                 TokenTree::Group(Group::new(
-                    Delimiter::Parenthesis,
-                    TokenStream::from_iter([
-                        TokenTree::Ident(Ident::new("vec", Span::call_site())),
-                        TokenTree::Punct(Punct::new('!', Spacing::Alone)),
-                        TokenTree::Group(Group::new(
-                            Delimiter::Bracket,
-                            TokenStream::from_iter(
-                                tree.children
-                                    .into_iter()
-                                    .flat_map(|children| children)
-                                    .flat_map(|child| {
-                                        let mut stream = convert_sml_to_rust(child).into_iter().collect::<Vec<_>>();
-                                        stream.push(TokenTree::Punct(Punct::new(',', Spacing::Alone)));
-                                        stream
-                                    }),
-                            ),
-                        )),
-                    ]),
+                    Delimiter::Bracket,
+                    TokenStream::from_iter(tree.children.into_iter().flat_map(|child| {
+                        let mut stream = convert_sml_to_rust(child).into_iter().collect::<Vec<_>>();
+                        stream.push(TokenTree::Punct(Punct::new(',', Spacing::Alone)));
+                        stream
+                    })),
                 )),
             ]),
         )),

@@ -1,15 +1,24 @@
 # SimpleML
 
-This crate is a rust implementation of the [Simple Markup Language](https://www.simpleml.com/) specification. This specification is built on top of the [Whitespace Separated Value](https://dev.stenway.com/WSV/Specification.html) specification and provides a human-friendly configuration file format.
-
+This crate is a rust implementation of the
+[Simple Markup Language](https://www.simpleml.com/) specification. This
+specification is built on top of the
+[Whitespace Separated Value](https://dev.stenway.com/WSV/Specification.html)
+specification and provides a human-friendly configuration file format.
 
 ## Patch Notes
 
 ### 1.0.1
-Updating the dependency on [whitespacesv](https://crates.io/crates/whitespacesv) from 1.0.1 to 1.0.2, which [fixes a panic when writing jagged arrays](https://github.com/mr-adult/WhitespaceSV/issues/1). Since SML is built on top of WSV, this impacted the SMLWriter as well.
+
+Updating the dependency on [whitespacesv](https://crates.io/crates/whitespacesv)
+from 1.0.1 to 1.0.2, which
+[fixes a panic when writing jagged arrays](https://github.com/mr-adult/WhitespaceSV/issues/1).
+Since SML is built on top of WSV, this impacted the SMLWriter as well.
 
 ### 1.0.0
-This crate is 1.0 now! No breaking changes were introduced in this version, but it fixes a bug where malformed SML like the following would cause a panic:
+
+This crate is 1.0 now! No breaking changes were introduced in this version, but
+it fixes a bug where malformed SML like the following would cause a panic:
 
 ```simpleml
 Root
@@ -20,23 +29,44 @@ End
 
 ## Parsing
 
-This crate only provides a two APIs for parsing SML files. The [parse](https://docs.rs/simpleml/latest/simpleml/fn.parse.html) and [parse_owned](https://docs.rs/simpleml/latest/simpleml/fn.parse_owned.html) functions will parse the SML input, returning a Result. The Ok variant is a [TreeNode](https://docs.rs/tree_iterators_rs/latest/tree_iterators_rs/prelude/struct.TreeNode.html) from the [tree_iterators_rs](https://crates.io/crates/tree_iterators_rs) crate representing the elements of the hierarchy. I have chosen to build on top of it to provide you with all of the tree traversal utility methods built there when working with your SML content. I recommend adding `use tree_iterators_rs::prelude::*;` to the files that handle the SML content to pull the traversal methods into scope. The only difference between the two APIs is that [parse](https://docs.rs/simpleml/latest/simpleml/fn.parse.html) uses Cow<'_, str>'s to represent the SML nodes, and [parse_owned](https://docs.rs/simpleml/latest/simpleml/fn.parse_owned.html) uses Strings to represent the SML nodes. If you don't want to deal with lifetimes, use [parse_owned](https://docs.rs/simpleml/latest/simpleml/fn.parse_owned.html).
+This crate only provides a two APIs for parsing SML files. The
+[parse](https://docs.rs/simpleml/latest/simpleml/fn.parse.html) and
+[parse_owned](https://docs.rs/simpleml/latest/simpleml/fn.parse_owned.html)
+functions will parse the SML input, returning a Result. The Ok variant is a
+[TreeNode](https://docs.rs/tree_iterators_rs/latest/tree_iterators_rs/prelude/struct.TreeNode.html)
+from the [tree_iterators_rs](https://crates.io/crates/tree_iterators_rs) crate
+representing the elements of the hierarchy. I have chosen to build on top of it
+to provide you with all of the tree traversal utility methods built there when
+working with your SML content. I recommend adding
+`use tree_iterators_rs::prelude::*;` to the files that handle the SML content to
+pull the traversal methods into scope. The only difference between the two APIs
+is that [parse](https://docs.rs/simpleml/latest/simpleml/fn.parse.html) uses
+Cow<'_, str>'s to represent the SML nodes, and
+[parse_owned](https://docs.rs/simpleml/latest/simpleml/fn.parse_owned.html) uses
+Strings to represent the SML nodes. If you don't want to deal with lifetimes,
+use [parse_owned](https://docs.rs/simpleml/latest/simpleml/fn.parse_owned.html).
 
-Because SML is an extension on top of WSV, I have also pulled in [whitespacesv](https://crates.io/crates/whitespacesv) as a dependency.
+Because SML is an extension on top of WSV, I have also pulled in
+[whitespacesv](https://crates.io/crates/whitespacesv) as a dependency.
 
 ## In-line Declaration
 
-If you plan to include any SimpleML in your rust code or build system, consider using [simpleml_macro](https://crates.io/crates/simpleml_macro) to maintain everything in valid SML format.
-
+If you plan to include any SimpleML in your rust code or build system, consider
+using [simpleml_macro](https://crates.io/crates/simpleml_macro) to maintain
+everything in valid SML format.
 
 ## Writing
 
-In order to write an SML file, use the [SMLWriter](https://docs.rs/simpleml/latest/simpleml/struct.SMLWriter.html) struct. It provides several configuration options, including:
+In order to write an SML file, use the
+[SMLWriter](https://docs.rs/simpleml/latest/simpleml/struct.SMLWriter.html)
+struct. It provides several configuration options, including:
+
 1. any custom end keyword
 2. the column alignment of SML attribute WSV tables
 3. the indentation string (this must be whitespace)
 
 The list of whitespace characters is defined as follows:
+
 ```text
 Codepoint 	Name
 U+0009 	    Character Tabulation
@@ -67,6 +97,7 @@ U+3000 	    Ideographic Space
 ```
 
 An example of how to use the SMLWriter is as follows:
+
 ```rust
 use tree_iterators_rs::prelude::*;
 use simpleml::{SMLWriter, SMLElement, SMLAttribute};
@@ -77,7 +108,7 @@ let my_sml_values = TreeNode {
         name: "Configuration",
         attributes: Vec::with_capacity(0),
     },
-    children: Some(vec![
+    children: vec![
         TreeNode {
             value: SMLElement {
                 name: "Video",
@@ -96,7 +127,7 @@ let my_sml_values = TreeNode {
                     },
                 ],
             },
-            children: None,
+            children: Vec::new(),
         },
         TreeNode {
             value: SMLElement {
@@ -112,7 +143,7 @@ let my_sml_values = TreeNode {
                     },
                 ],
             },
-            children: None,
+            children: Vec::new(),
         },
         TreeNode {
             value: SMLElement {
@@ -122,9 +153,9 @@ let my_sml_values = TreeNode {
                     values: vec![Some("Hero 123")],
                 }],
             },
-            children: None,
+            children: Vec::new(),
         },
-    ]),
+    ],
 };
 
 // actually write the values
