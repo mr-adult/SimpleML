@@ -6,6 +6,14 @@ code.
 
 ## Patch Notes
 
+### 2.0.0
+
+Updating the dependency on
+[tree_iterators_rs](https://crates.io/crates/tree_iterators_rs) to version 2.0
+for better performance. This is a breaking change and all consumers will need to
+update their code to get these performance benefits. If performance is not a
+problem for you, there is no reason to switch.
+
 ### 1.0.1
 
 [Fixes a macro panic when null values are used](https://github.com/mr-adult/SimpleML/issues/1)
@@ -18,9 +26,9 @@ macro requires the nightly compiler for the
 
 ```toml
 [dependencies]
-tree_iterators_rs = "1.2.1"
-simpleml = "1.0.0"
-simpleml_macro = "1.0.0"
+tree_iterators_rs = "2.0"
+simpleml = "2.0"
+simpleml_macro = "2.0"
 ```
 
 Once you have these dependencies in place, simply add a using for the macro, and

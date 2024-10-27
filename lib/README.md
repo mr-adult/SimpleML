@@ -8,6 +8,14 @@ specification and provides a human-friendly configuration file format.
 
 ## Patch Notes
 
+### 2.0.0
+
+Updating the dependency on
+[tree_iterators_rs](https://crates.io/crates/tree_iterators_rs) to version 2.0
+for better performance. This is a breaking change and all consumers will need to
+update their code to get these performance benefits. If performance is not a
+problem for you, there is no reason to switch.
+
 ### 1.0.1
 
 Updating the dependency on [whitespacesv](https://crates.io/crates/whitespacesv)
