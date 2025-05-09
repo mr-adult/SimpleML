@@ -1,32 +1,32 @@
 #![doc = include_str!("../README.md")]
 
 use std::{borrow::Cow, error::Error, fmt::Display};
-use tree_iterators_rs::prelude::{OwnedTreeNode, TreeNode};
+use tree_iterators_rs::prelude::{OwnedTreeNode, Tree};
 use whitespacesv::{ColumnAlignment, WSVError, WSVWriter};
 
 /// Equivalent to [parse](https://docs.rs/simpleml/latest/simpleml/fn.parse.html),
 /// but returns Strings instead of Cows for better ease of use.
-pub fn parse_owned(source_text: &str) -> Result<TreeNode<SMLElement<String>>, ParseError> {
+pub fn parse_owned(source_text: &str) -> Result<Tree<SMLElement<String>>, ParseError> {
     let borrowed = parse(source_text)?;
     Ok(to_owned(borrowed))
 }
 
-fn to_owned(tree: TreeNode<SMLElement<Cow<'_, str>>>) -> TreeNode<SMLElement<String>> {
+fn to_owned(tree: Tree<SMLElement<Cow<'_, str>>>) -> Tree<SMLElement<String>> {
     let mut new_children = Vec::with_capacity(tree.children.len());
     for child in tree.children {
         new_children.push(to_owned(child));
     }
 
-    TreeNode {
+    Tree {
         value: tree.value.to_owned(),
         children: new_children,
     }
 }
 
 /// Parses the Simple Markup Language text into a tree of SMLElements.
-/// For details about how to use TreeNode, see [tree_iterators_rs](https://crates.io/crates/tree_iterators_rs)
+/// For details about how to use Tree, see [tree_iterators_rs](https://crates.io/crates/tree_iterators_rs)
 /// and the documentation related to that crate.
-pub fn parse(source_text: &str) -> Result<TreeNode<SMLElement<Cow<'_, str>>>, ParseError> {
+pub fn parse(source_text: &str) -> Result<Tree<SMLElement<Cow<'_, str>>>, ParseError> {
     let wsv_result = whitespacesv::parse(source_text);
     let wsv = match wsv_result {
         Err(err) => return Err(ParseError::WSV(err)),
@@ -72,7 +72,7 @@ pub fn parse(source_text: &str) -> Result<TreeNode<SMLElement<Cow<'_, str>>>, Pa
         }
     }
 
-    let root = TreeNode {
+    let root = Tree {
         value: SMLElement {
             name: root_element_name,
             attributes: Vec::with_capacity(0),
@@ -142,7 +142,7 @@ pub fn parse(source_text: &str) -> Result<TreeNode<SMLElement<Cow<'_, str>>>, Pa
                     }
                 }
             } else {
-                nodes_being_built.push(TreeNode {
+                nodes_being_built.push(Tree {
                     value: SMLElement {
                         name: val.expect("BUG: Null element names are prohibited."),
                         attributes: Vec::with_capacity(0),
@@ -197,14 +197,14 @@ where
     indent_str: String,
     end_keyword: Option<String>,
     column_alignment: ColumnAlignment,
-    values: TreeNode<SMLElement<StrAsRef>>,
+    values: Tree<SMLElement<StrAsRef>>,
 }
 
 impl<StrAsRef> SMLWriter<StrAsRef>
 where
     StrAsRef: AsRef<str> + From<&'static str> + ToString,
 {
-    pub fn new(values: TreeNode<SMLElement<StrAsRef>>) -> Self {
+    pub fn new(values: Tree<SMLElement<StrAsRef>>) -> Self {
         Self {
             values,
             indent_str: "    ".to_string(), // default to 4 spaces
@@ -286,7 +286,7 @@ where
     }
 
     fn to_string_helper(
-        value: TreeNode<SMLElement<StrAsRef>>,
+        value: Tree<SMLElement<StrAsRef>>,
         depth: usize,
         alignment: &ColumnAlignment,
         indent_str: &str,
@@ -789,13 +789,13 @@ mod tests {
         use tree_iterators_rs::prelude::*;
 
         // Build up our value set
-        let my_sml_values = TreeNode {
+        let my_sml_values = Tree {
             value: SMLElement {
                 name: "Configuration",
                 attributes: Vec::with_capacity(0),
             },
             children: vec![
-                TreeNode {
+                Tree {
                     value: SMLElement {
                         name: "Video",
                         attributes: vec![
@@ -815,7 +815,7 @@ mod tests {
                     },
                     children: Vec::new(),
                 },
-                TreeNode {
+                Tree {
                     value: SMLElement {
                         name: "Audio",
                         attributes: vec![
@@ -831,7 +831,7 @@ mod tests {
                     },
                     children: Vec::new(),
                 },
-                TreeNode {
+                Tree {
                     value: SMLElement {
                         name: "Player",
                         attributes: vec![SMLAttribute {

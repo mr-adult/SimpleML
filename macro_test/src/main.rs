@@ -5,7 +5,7 @@ fn main() {
         Configuration
             Video
                 Resolution 1280 720
-                RefreshRate   60
+                RefreshRate  60
                 Fullscreen true
             my_custom_end_keyword
             Audio

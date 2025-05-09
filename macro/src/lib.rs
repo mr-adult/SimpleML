@@ -8,14 +8,14 @@ use proc_macro::{
     TokenTree,
 };
 use simpleml::{parse, SMLElement};
-use tree_iterators_rs::prelude::TreeNode;
+use tree_iterators_rs::prelude::Tree;
 
 extern crate proc_macro;
 
 static DEBUG: bool = false;
 
 /// Handles parsing and converting the SML into a Rust-based
-/// TreeNode representation for better portability between
+/// Tree representation for better portability between
 /// SML files.
 #[proc_macro]
 pub fn sml(stream: TokenStream) -> TokenStream {
@@ -137,7 +137,7 @@ fn reconstruct_source_whitespace_internal(
     end_position
 }
 
-fn convert_sml_to_rust(tree: TreeNode<SMLElement<Cow<'_, str>>>) -> TokenStream {
+fn convert_sml_to_rust(tree: Tree<SMLElement<Cow<'_, str>>>) -> TokenStream {
     TokenStream::from_iter([
         TokenTree::Ident(Ident::new("tree_iterators_rs", Span::call_site())),
         TokenTree::Punct(Punct::new(':', Spacing::Joint)),
@@ -145,7 +145,7 @@ fn convert_sml_to_rust(tree: TreeNode<SMLElement<Cow<'_, str>>>) -> TokenStream 
         TokenTree::Ident(Ident::new("prelude", Span::call_site())),
         TokenTree::Punct(Punct::new(':', Spacing::Joint)),
         TokenTree::Punct(Punct::new(':', Spacing::Alone)),
-        TokenTree::Ident(Ident::new("TreeNode", Span::call_site())),
+        TokenTree::Ident(Ident::new("Tree", Span::call_site())),
         TokenTree::Group(Group::new(
             Delimiter::Brace,
             TokenStream::from_iter([

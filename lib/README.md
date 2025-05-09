@@ -8,6 +8,12 @@ specification and provides a human-friendly configuration file format.
 
 ## Patch Notes
 
+### 3.0.0
+
+Updating the dependency on
+[tree_iterators_rs](https://crates.io/crates/tree_iterators_rs) to version 3.2
+to get new features.
+
 ### 2.0.0
 
 Updating the dependency on
