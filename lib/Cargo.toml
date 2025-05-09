@@ -1,6 +1,6 @@
 [package]
 name = "simpleml"
-version = "2.0.0"
+version = "3.0.0"
 edition = "2021"
 description = "A Rust implementation of a parser/writer for the Simple Markup Language format, as defined by Stenway. See https://dev.stenway.com/SML/. SML builds on top of WSV but allows hierarchical structuring of data."
 license = "MIT"
@@ -12,4 +12,4 @@ keywords = ["sml", "simple", "markup", "language", "ReliableTXT"]
 
 [dependencies]
 whitespacesv = "1.0.2"
-tree_iterators_rs = "2.0"
+tree_iterators_rs = "3.2"

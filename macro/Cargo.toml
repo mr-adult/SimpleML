@@ -1,6 +1,6 @@
 [package]
 name = "simpleml_macro"
-version = "2.0.0"
+version = "3.0.0"
 edition = "2021"
 description = "A macro for placing SimpleML content directly into Rust source code."
 license = "MIT"
@@ -12,5 +12,5 @@ keywords = ["sml", "simple", "markup", "language", "ReliableTXT"]
 proc-macro = true
 
 [dependencies]
-tree_iterators_rs = "2.0"
-simpleml = { path = "../lib", version = "2.0" }
+tree_iterators_rs = "3.2"
+simpleml = { path = "../lib", version = "3.0" }
