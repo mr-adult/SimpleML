@@ -1,7 +1,7 @@
 #![doc = include_str!("../README.md")]
 
 use std::{borrow::Cow, error::Error, fmt::Display};
-use tree_iterators_rs::prelude::{OwnedTreeNode, Tree};
+use tree_iterators_rs::prelude::{BorrowedTreeNode, Tree};
 use whitespacesv::{ColumnAlignment, WSVError, WSVWriter};
 
 /// Equivalent to [parse](https://docs.rs/simpleml/latest/simpleml/fn.parse.html),
@@ -190,21 +190,21 @@ pub fn parse(source_text: &str) -> Result<Tree<SMLElement<Cow<'_, str>>>, ParseE
     }
 }
 
-pub struct SMLWriter<StrAsRef>
+pub struct SMLWriter<'values, StrAsRef>
 where
     StrAsRef: AsRef<str> + From<&'static str> + ToString,
 {
     indent_str: String,
     end_keyword: Option<String>,
     column_alignment: ColumnAlignment,
-    values: Tree<SMLElement<StrAsRef>>,
+    values: &'values Tree<SMLElement<StrAsRef>>,
 }
 
-impl<StrAsRef> SMLWriter<StrAsRef>
+impl<'values, StrAsRef> SMLWriter<'values, StrAsRef>
 where
     StrAsRef: AsRef<str> + From<&'static str> + ToString,
 {
-    pub fn new(values: Tree<SMLElement<StrAsRef>>) -> Self {
+    pub fn new(values: &'values Tree<SMLElement<StrAsRef>>) -> Self {
         Self {
             values,
             indent_str: "    ".to_string(), // default to 4 spaces
@@ -275,7 +275,7 @@ where
     pub fn to_string(self) -> Result<String, SMLWriterError> {
         let mut result = String::new();
         Self::to_string_helper(
-            self.values,
+            &self.values,
             0,
             &self.column_alignment,
             &self.indent_str,
@@ -286,14 +286,14 @@ where
     }
 
     fn to_string_helper(
-        value: Tree<SMLElement<StrAsRef>>,
+        value: &Tree<SMLElement<StrAsRef>>,
         depth: usize,
         alignment: &ColumnAlignment,
         indent_str: &str,
         end_keyword: Option<&String>,
         buf: &mut String,
     ) -> Result<(), SMLWriterError> {
-        let (value, children) = value.get_value_and_children();
+        let (value, children) = value.get_value_and_children_iter();
         if let Some(end_keyword) = end_keyword {
             if value.name.as_ref() == end_keyword {
                 return Err(SMLWriterError::ElementHasEndKeywordName);
@@ -320,10 +320,14 @@ where
             }
         }
 
-        let values_for_writer = value
-            .attributes
-            .into_iter()
-            .map(|attr| std::iter::once(Some(attr.name)).chain(attr.values.into_iter()));
+        let values_for_writer = value.attributes.iter().map(|attr| {
+            std::iter::once(Some(attr.name.as_ref())).chain(attr.values.iter().map(|value| {
+                match value {
+                    None => None,
+                    Some(val) => Some(val.as_ref()),
+                }
+            }))
+        });
 
         match alignment {
             ColumnAlignment::Packed => {
