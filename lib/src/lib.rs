@@ -779,7 +779,7 @@ mod tests {
         let input = include_str!("../example.txt");
         println!(
             "{}",
-            super::SMLWriter::new(super::parse(input).unwrap())
+            super::SMLWriter::new(&super::parse(input).unwrap())
                 .align_columns(whitespacesv::ColumnAlignment::Right)
                 .indent_with(" ")
                 .unwrap()
@@ -849,7 +849,7 @@ mod tests {
         };
 
         // actually write the values
-        let str = SMLWriter::new(my_sml_values)
+        let str = SMLWriter::new(&my_sml_values)
             // Setting up a custom end keyword
             .with_end_keyword(Some("my_custom_end_keyword"))
             // Using 8 spaces as the indent string. The default is 4 spaces.
