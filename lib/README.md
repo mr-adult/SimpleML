@@ -8,6 +8,12 @@ specification and provides a human-friendly configuration file format.
 
 ## Patch Notes
 
+### 4.0.0
+
+Updating SMLWriter to take a &Tree<SMLElement> instead of a Tree<SMLElement> to
+provide better performance for callers that need to keep the SML data after the
+SMLWriter call.
+
 ### 3.0.0
 
 Updating the dependency on
