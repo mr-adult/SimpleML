@@ -6,6 +6,11 @@ code.
 
 ## Patch Notes
 
+### 3.0.1
+
+Fixing README being out of date and updated to use SimpleML v4.0.0. No code
+changes.
+
 ### 3.0.0
 
 Updating the dependency on

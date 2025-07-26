@@ -13,7 +13,7 @@ dependencies = [
 
 [[package]]
 name = "simpleml"
-version = "3.0.0"
+version = "4.0.0"
 dependencies = [
  "tree_iterators_rs",
  "whitespacesv",
@@ -21,7 +21,7 @@ dependencies = [
 
 [[package]]
 name = "simpleml_macro"
-version = "3.0.0"
+version = "3.0.1"
 dependencies = [
  "simpleml",
  "tree_iterators_rs",
