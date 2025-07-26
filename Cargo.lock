@@ -35,15 +35,13 @@ checksum = "2b2231b7c3057d5e4ad0156fb3dc807d900806020c5ffa3ee6ff2c8c76fb8520"
 
 [[package]]
 name = "tree_iterators_rs"
-version = "3.2.0"
+version = "3.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "907fa04de30ffc19861c71c279228363db0d1a5e53cb8d6e2bf59f972257b1c5"
+checksum = "921f2b45e47680b4daf3c0db6efecaaa78a9f52a0856956c4da77f11876ccf33"
 dependencies = [
  "streaming-iterator",
 ]
 
 [[package]]
 name = "whitespacesv"
-version = "1.0.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f247f84ab85ed191183badb78209b6ea3fb7ef35af2347a08f243200401be11f"
+version = "1.0.3"

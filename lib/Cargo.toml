@@ -11,5 +11,5 @@ keywords = ["sml", "simple", "markup", "language", "ReliableTXT"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-whitespacesv = "1.0.2"
-tree_iterators_rs = "3.2"
+whitespacesv = { version = "1.0.3", path = "../../WhitespaceSV" }
+tree_iterators_rs = "3.5"
