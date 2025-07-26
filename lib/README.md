@@ -47,7 +47,7 @@ This crate only provides a two APIs for parsing SML files. The
 [parse](https://docs.rs/simpleml/latest/simpleml/fn.parse.html) and
 [parse_owned](https://docs.rs/simpleml/latest/simpleml/fn.parse_owned.html)
 functions will parse the SML input, returning a Result. The Ok variant is a
-[TreeNode](https://docs.rs/tree_iterators_rs/latest/tree_iterators_rs/prelude/struct.TreeNode.html)
+[Tree](https://docs.rs/tree_iterators_rs/3.5.0/tree_iterators_rs/prelude/struct.Tree.html)
 from the [tree_iterators_rs](https://crates.io/crates/tree_iterators_rs) crate
 representing the elements of the hierarchy. I have chosen to build on top of it
 to provide you with all of the tree traversal utility methods built there when
@@ -67,7 +67,9 @@ Because SML is an extension on top of WSV, I have also pulled in
 
 If you plan to include any SimpleML in your rust code or build system, consider
 using [simpleml_macro](https://crates.io/crates/simpleml_macro) to maintain
-everything in valid SML format.
+everything in valid SML format. Note that this does not play well with
+rust-analyzer and may cause phantom errors to be shown which still compile
+successfully.
 
 ## Writing
 
@@ -117,13 +119,13 @@ use tree_iterators_rs::prelude::*;
 use simpleml::{SMLWriter, SMLElement, SMLAttribute};
 
 // Build up our value set
-let my_sml_values = TreeNode {
+let my_sml_values = Tree {
     value: SMLElement {
         name: "Configuration",
         attributes: Vec::with_capacity(0),
     },
     children: vec![
-        TreeNode {
+        Tree {
             value: SMLElement {
                 name: "Video",
                 attributes: vec![
@@ -143,7 +145,7 @@ let my_sml_values = TreeNode {
             },
             children: Vec::new(),
         },
-        TreeNode {
+        Tree {
             value: SMLElement {
                 name: "Audio",
                 attributes: vec![
@@ -159,7 +161,7 @@ let my_sml_values = TreeNode {
             },
             children: Vec::new(),
         },
-        TreeNode {
+        Tree {
             value: SMLElement {
                 name: "Player",
                 attributes: vec![SMLAttribute {

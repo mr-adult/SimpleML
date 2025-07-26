@@ -48,13 +48,13 @@ comes from the README.md file of [simpleml](https://crates.io/crates/simpleml).
 use tree_iterators_rs::prelude::*;
 use simpleml::{SMLWriter, SMLElement, SMLAttribute};
 
-let my_sml_values = TreeNode {
+let my_sml_values = Tree {
     value: SMLElement {
         name: "Configuration",
         attributes: Vec::with_capacity(0),
     },
     children: vec![
-        TreeNode {
+        Tree {
             value: SMLElement {
                 name: "Video",
                 attributes: vec![
@@ -74,7 +74,7 @@ let my_sml_values = TreeNode {
             },
             children: Vec::new(),
         },
-        TreeNode {
+        Tree {
             value: SMLElement {
                 name: "Audio",
                 attributes: vec![
@@ -90,7 +90,7 @@ let my_sml_values = TreeNode {
             },
             children: Vec::new(),
         },
-        TreeNode {
+        Tree {
             value: SMLElement {
                 name: "Player",
                 attributes: vec![SMLAttribute {
